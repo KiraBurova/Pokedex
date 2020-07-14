@@ -1,8 +1,7 @@
 import { decorate, observable, runInAction, action, computed } from 'mobx';
-
 class PokemonsStore {
   pokemons = [];
-  pokemon = {};
+  selectedPokemon = {};
   loading = false;
   error = false;
   count = 0;
@@ -14,9 +13,12 @@ class PokemonsStore {
     const amountOfRows = [...Array(Math.ceil(this.pokemons.length / 4))];
     // chunk the products into the array of rows
     const rows = amountOfRows.map((row, index) => this.pokemons.slice(index * 4, index * 4 + 4));
-    console.log(rows);
     return rows;
   }
+
+  getPokemonInfo = (pokemonId) => {
+    this.selectedPokemon = this.pokemons.find(({ id }) => id === pokemonId);
+  };
 
   async fetchPokemons(limit = 20) {
     this.loading = true;
@@ -40,6 +42,7 @@ class PokemonsStore {
       });
     }
   }
+
   async fetchPokemon(url) {
     try {
       const result = await fetch(url);
@@ -59,10 +62,12 @@ class PokemonsStore {
 
 export default decorate(PokemonsStore, {
   pokemons: observable,
-  pokemon: observable,
   loading: observable,
   error: observable,
   count: observable,
+  selectedPokemon: observable,
   fetchPokemons: action,
+  searchPokemons: action,
   pokemonsRows: computed,
+  pokemonInfo: action,
 });
