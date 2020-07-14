@@ -1,6 +1,6 @@
 import React from 'react';
 
-import PokemonsListScreen from './screens/PokemonsListScreen/PokemonsListScreen';
+import PokemonsListScreen from './screens/PokemonsListScreen';
 
 const App = () => {
   return (

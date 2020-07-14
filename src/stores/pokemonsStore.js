@@ -7,6 +7,17 @@ class PokemonsStore {
   error = false;
   count = 0;
 
+  get pokemonsRows() {
+    // return [1,2,3,4,5,6,7,8] => [ [1, 2, 3, 4], [5, 6, 7, 8 ] ]
+
+    //amount of rows needed to fir all the elements
+    const amountOfRows = [...Array(Math.ceil(this.pokemons.length / 4))];
+    // chunk the products into the array of rows
+    const rows = amountOfRows.map((row, index) => this.pokemons.slice(index * 4, index * 4 + 4));
+    console.log(rows);
+    return rows;
+  }
+
   async fetchPokemons(limit = 20) {
     this.loading = true;
     try {
@@ -53,4 +64,5 @@ export default decorate(PokemonsStore, {
   error: observable,
   count: observable,
   fetchPokemons: action,
+  pokemonsRows: computed,
 });
