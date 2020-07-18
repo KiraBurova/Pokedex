@@ -9,7 +9,6 @@ class PokemonsStore {
 
   get pokemonsRows() {
     // return [1,2,3,4,5,6,7,8] => [ [1, 2, 3, 4], [5, 6, 7, 8 ] ]
-
     //amount of rows needed to fir all the elements
     const amountOfRows = [...Array(Math.ceil(this.pokemons.length / 4))];
     // chunk the products into the array of rows
@@ -26,7 +25,7 @@ class PokemonsStore {
     );
   };
 
-  async fetchPokemonAbilities(url) {
+  fetchPokemonAbilities = async (url) => {
     const result = await fetch(url);
     const data = await result.json();
 
@@ -38,38 +37,41 @@ class PokemonsStore {
       this.error = true;
       this.loading = false;
     }
-  }
+  };
 
-  async fetchPokemons(limit = 20) {
+  fetchPokemons = async (offset = 0, pageSize = 0) => {
     this.loading = true;
     try {
-      const result = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}`);
+      const result = await fetch(`https://pokeapi.co/api/v2/pokemon?offset=${offset}`);
       const data = await result.json();
       const pokemons = data.results;
       const count = data.count;
 
       runInAction(() => {
-        this.loading = false;
         this.count = count;
         this.error = false;
       });
 
-      pokemons.forEach((pokemon) => this.fetchPokemon(pokemon.url));
+      pokemons.forEach((pokemon) => this.fetchPokemon(pokemon.url, pageSize));
     } catch (error) {
       runInAction(() => {
         this.loading = false;
         this.error = true;
       });
     }
-  }
+  };
 
-  async fetchPokemon(url) {
+  fetchPokemon = async (url, pageSize) => {
     try {
       const result = await fetch(url);
       const data = await result.json();
 
       runInAction(() => {
+        if (this.pokemons.length >= pageSize && pageSize) {
+          this.pokemons = [];
+        }
         this.pokemons.push(data);
+        this.loading = false;
       });
     } catch (error) {
       runInAction(() => {
@@ -77,7 +79,7 @@ class PokemonsStore {
         this.error = true;
       });
     }
-  }
+  };
 }
 
 export default decorate(PokemonsStore, {

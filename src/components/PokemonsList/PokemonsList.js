@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toJS } from 'mobx';
 
-import { Row, Col } from 'antd';
+import { Row, Col, Spin } from 'antd';
 import { observer } from 'mobx-react-lite';
 
 import { useStores } from '../../hooks/use-stores';
@@ -14,6 +14,7 @@ import styles from './PokemonsList.module.scss';
 const PokemonsList = observer(() => {
   const { pokemonsStore } = useStores();
   const pokemonsRows = pokemonsStore.pokemonsRows;
+  const loading = pokemonsStore.loading;
   const getPokemonInfo = pokemonsStore.getPokemonInfo;
   const selectedPokemon = pokemonsStore.selectedPokemon;
   const pokemonAbilities = pokemonsStore.pokemonAbilities;
@@ -31,26 +32,28 @@ const PokemonsList = observer(() => {
 
   return (
     <div className={styles.rowsHolder}>
-      {pokemonsRows &&
-        pokemonsRows.map((row, index) => {
-          return (
-            <Row key={index} gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 16]} justify='center'>
-              {row.map((pokemon) => {
-                return (
-                  <Col span={5} key={pokemon.id} onClick={() => selectPokemon(pokemon.id)}>
-                    <PokemonCard pokemon={pokemon} />
-                  </Col>
-                );
-              })}
-            </Row>
-          );
-        })}
-      <PokemonModal
-        setVisible={setVisible}
-        visible={visible}
-        selectedPokemon={selectedPokemon}
-        pokemonAbilities={pokemonAbilities}
-      />
+      <Spin size='large' spinning={loading}>
+        {pokemonsRows &&
+          pokemonsRows.map((row, index) => {
+            return (
+              <Row key={index} gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 16]} justify='center'>
+                {row.map((pokemon) => {
+                  return (
+                    <Col span={5} key={pokemon.id} onClick={() => selectPokemon(pokemon.id)}>
+                      <PokemonCard pokemon={pokemon} />
+                    </Col>
+                  );
+                })}
+              </Row>
+            );
+          })}
+        <PokemonModal
+          setVisible={setVisible}
+          visible={visible}
+          selectedPokemon={selectedPokemon}
+          pokemonAbilities={pokemonAbilities}
+        />
+      </Spin>
     </div>
   );
 });

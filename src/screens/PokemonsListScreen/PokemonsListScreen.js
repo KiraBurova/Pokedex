@@ -1,12 +1,23 @@
 import React from 'react';
 
-import { Layout, PageHeader } from 'antd';
+import { observer } from 'mobx-react-lite';
 
+import { Layout, PageHeader, Pagination } from 'antd';
+
+import { useStores } from '../../hooks/use-stores';
 import PokemonsList from '../../components/PokemonsList';
 
 const { Header, Footer, Content } = Layout;
 
-const PokemonsListScreen = () => {
+const PokemonsListScreen = observer(() => {
+  const { pokemonsStore } = useStores();
+  const totalItems = pokemonsStore.count;
+  const fetchPokemons = pokemonsStore.fetchPokemons;
+
+  const changePage = (pageNumber, pageSize) => {
+    fetchPokemons(pageNumber, pageSize);
+  };
+
   return (
     <Layout>
       <Header>Header</Header>
@@ -16,13 +27,20 @@ const PokemonsListScreen = () => {
           onBack={() => window.history.back()}
           title='Pokedex'
         >
-          <Content></Content>
+          <Content>
+            <Pagination
+              total={totalItems}
+              defaultPageSize={20}
+              defaultCurrent={1}
+              onChange={changePage}
+            />
+          </Content>
         </PageHeader>
         <PokemonsList />
       </Content>
       <Footer>Footer</Footer>
     </Layout>
   );
-};
+});
 
 export default PokemonsListScreen;
