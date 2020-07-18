@@ -2,6 +2,7 @@ import { decorate, observable, runInAction, action, computed } from 'mobx';
 class PokemonsStore {
   pokemons = [];
   selectedPokemon = {};
+  pokemonAbilities = [];
   loading = false;
   error = false;
   count = 0;
@@ -17,8 +18,27 @@ class PokemonsStore {
   }
 
   getPokemonInfo = (pokemonId) => {
+    this.pokemonAbilities = [];
     this.selectedPokemon = this.pokemons.find(({ id }) => id === pokemonId);
+
+    this.selectedPokemon.abilities.forEach((ability) =>
+      this.fetchPokemonAbilities(ability.ability.url),
+    );
   };
+
+  async fetchPokemonAbilities(url) {
+    const result = await fetch(url);
+    const data = await result.json();
+
+    runInAction(() => {
+      this.pokemonAbilities.push(data);
+    });
+    try {
+    } catch (error) {
+      this.error = true;
+      this.loading = false;
+    }
+  }
 
   async fetchPokemons(limit = 20) {
     this.loading = true;
@@ -65,6 +85,7 @@ export default decorate(PokemonsStore, {
   loading: observable,
   error: observable,
   count: observable,
+  pokemonAbilities: observable,
   selectedPokemon: observable,
   fetchPokemons: action,
   searchPokemons: action,

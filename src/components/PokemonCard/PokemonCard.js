@@ -1,12 +1,15 @@
 import React from 'react';
 
+import PropTypes from 'prop-types';
+
 import { Card, Tag, Avatar, Descriptions } from 'antd';
 
 import { getColorsForTag } from '../../helpers/helpers';
 
 import styles from './PokemonCard.module.scss';
+import { observer } from 'mobx-react-lite';
 
-const PokemonCard = ({ pokemon }) => {
+const PokemonCard = observer(({ pokemon }) => {
   return (
     <Card className={styles.card}>
       <Card.Meta
@@ -26,6 +29,16 @@ const PokemonCard = ({ pokemon }) => {
         ))}
     </Card>
   );
+});
+
+PokemonCard.propTypes = {
+  pokemon: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    height: PropTypes.number.isRequired,
+    weight: PropTypes.number.isRequired,
+    types: PropTypes.array.isRequired,
+    sprites: PropTypes.object.isRequired,
+  }).isRequired,
 };
 
 export default PokemonCard;

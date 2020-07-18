@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toJS } from 'mobx';
 
 import { Row, Col } from 'antd';
 import { observer } from 'mobx-react-lite';
@@ -6,15 +7,16 @@ import { observer } from 'mobx-react-lite';
 import { useStores } from '../../hooks/use-stores';
 
 import PokemonCard from '../PokemonCard';
+import PokemonModal from '../PokemonModal';
 
 import styles from './PokemonsList.module.scss';
-import Modal from 'antd/lib/modal/Modal';
 
 const PokemonsList = observer(() => {
   const { pokemonsStore } = useStores();
   const pokemonsRows = pokemonsStore.pokemonsRows;
   const getPokemonInfo = pokemonsStore.getPokemonInfo;
   const selectedPokemon = pokemonsStore.selectedPokemon;
+  const pokemonAbilities = pokemonsStore.pokemonAbilities;
 
   const [visible, setVisible] = useState(false);
 
@@ -25,10 +27,6 @@ const PokemonsList = observer(() => {
   const selectPokemon = (id) => {
     setVisible(true);
     getPokemonInfo(id);
-  };
-
-  const handleCancel = () => {
-    setVisible(false);
   };
 
   return (
@@ -47,12 +45,12 @@ const PokemonsList = observer(() => {
             </Row>
           );
         })}
-      <Modal
+      <PokemonModal
+        setVisible={setVisible}
         visible={visible}
-        title={selectedPokemon.name}
-        footer={null}
-        onCancel={handleCancel}
-      ></Modal>
+        selectedPokemon={selectedPokemon}
+        pokemonAbilities={pokemonAbilities}
+      />
     </div>
   );
 });
