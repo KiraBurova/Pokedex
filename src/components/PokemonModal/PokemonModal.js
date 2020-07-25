@@ -52,6 +52,7 @@ PokemonModal.propTypes = {
   pokemonAbilities: PropTypes.array.isRequired,
   setVisible: PropTypes.func.isRequired,
   visible: PropTypes.bool.isRequired,
+  loading: PropTypes.bool.isRequired,
 };
 
 export default PokemonModal;

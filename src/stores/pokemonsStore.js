@@ -2,8 +2,11 @@ import { decorate, observable, runInAction, action, computed } from 'mobx';
 class PokemonsStore {
   pokemons = [];
   selectedPokemon = {};
+  loadingState = {
+    pokemonList: false,
+    pokemonDetails: false,
+  };
   pokemonAbilities = [];
-  loading = false;
   error = false;
   count = 0;
 
@@ -17,33 +20,36 @@ class PokemonsStore {
   }
 
   getPokemonInfo = (pokemonId) => {
+    this.loadingState.pokemonDetails = true;
     this.pokemonAbilities = [];
     this.selectedPokemon = this.pokemons.find(({ id }) => id === pokemonId);
-    this.loading = true;
-    this.selectedPokemon.abilities.forEach((ability) =>
-      this.fetchPokemonAbilities(ability.ability.url),
-    );
+    this.selectedPokemon.abilities.forEach((ability) => {
+      this.fetchPokemonAbilities(ability.ability.url, this.selectedPokemon);
+    });
   };
 
-  fetchPokemonAbilities = async (url) => {
+  fetchPokemonAbilities = async (url, selectedPokemon) => {
     const result = await fetch(url);
     const data = await result.json();
 
     runInAction(() => {
       this.pokemonAbilities.push(data);
-      this.loading = false;
-      console.log(13);
+
+      if (this.pokemonAbilities.length === selectedPokemon.abilities.length) {
+        this.loadingState.pokemonDetails = false;
+      }
     });
     try {
     } catch (error) {
       this.error = true;
-      this.loading = false;
+      this.loadingState.pokemonDetails = false;
     }
   };
 
-  fetchPokemons = async (offset = 0, pageSize = 0) => {
+  fetchPokemons = async (offset = 0, pageSize = 20) => {
     this.loading = true;
     try {
+      this.loadingState.pokemonList = true;
       const result = await fetch(`https://pokeapi.co/api/v2/pokemon?offset=${offset}`);
       const data = await result.json();
       const pokemons = data.results;
@@ -54,11 +60,13 @@ class PokemonsStore {
         this.error = false;
       });
 
-      pokemons.forEach((pokemon) => this.fetchPokemon(pokemon.url, pageSize));
+      pokemons.forEach((pokemon) => {
+        this.fetchPokemon(pokemon.url, pageSize);
+      });
     } catch (error) {
       runInAction(() => {
-        this.loading = false;
         this.error = true;
+        this.loadingState.pokemonList = false;
       });
     }
   };
@@ -73,12 +81,15 @@ class PokemonsStore {
           this.pokemons = [];
         }
         this.pokemons.push(data);
-        this.loading = false;
+
+        if (pageSize === this.pokemons.length) {
+          this.loadingState.pokemonList = false;
+        }
       });
     } catch (error) {
       runInAction(() => {
-        this.loading = false;
         this.error = true;
+        this.loadingState.pokemonList = false;
       });
     }
   };
@@ -86,7 +97,6 @@ class PokemonsStore {
 
 export default decorate(PokemonsStore, {
   pokemons: observable,
-  loading: observable,
   error: observable,
   count: observable,
   pokemonAbilities: observable,
@@ -95,4 +105,5 @@ export default decorate(PokemonsStore, {
   searchPokemons: action,
   pokemonsRows: computed,
   pokemonInfo: action,
+  loadingState: observable,
 });

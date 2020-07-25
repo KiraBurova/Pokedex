@@ -14,9 +14,10 @@ import styles from './PokemonsList.module.scss';
 const PokemonsList = observer(() => {
   const { pokemonsStore } = useStores();
   const pokemonsRows = pokemonsStore.pokemonsRows;
-  const loading = pokemonsStore.loading;
   const getPokemonInfo = pokemonsStore.getPokemonInfo;
   const selectedPokemon = pokemonsStore.selectedPokemon;
+  const loadingList = pokemonsStore.loadingState.pokemonList;
+  const loadingDetails = pokemonsStore.loadingState.pokemonDetails;
   const pokemonAbilities = pokemonsStore.pokemonAbilities;
 
   const [visible, setVisible] = useState(false);
@@ -32,7 +33,7 @@ const PokemonsList = observer(() => {
 
   return (
     <div className={styles.rowsHolder}>
-      <Spin size='large' spinning={loading}>
+      <Spin size='large' spinning={loadingList}>
         {pokemonsRows &&
           pokemonsRows.map((row, index) => {
             return (
@@ -52,7 +53,7 @@ const PokemonsList = observer(() => {
           visible={visible}
           selectedPokemon={selectedPokemon}
           pokemonAbilities={pokemonAbilities}
-          loading={loading}
+          loading={loadingDetails}
         />
       </Spin>
     </div>
