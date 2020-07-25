@@ -19,7 +19,7 @@ class PokemonsStore {
   getPokemonInfo = (pokemonId) => {
     this.pokemonAbilities = [];
     this.selectedPokemon = this.pokemons.find(({ id }) => id === pokemonId);
-
+    this.loading = true;
     this.selectedPokemon.abilities.forEach((ability) =>
       this.fetchPokemonAbilities(ability.ability.url),
     );
@@ -31,6 +31,8 @@ class PokemonsStore {
 
     runInAction(() => {
       this.pokemonAbilities.push(data);
+      this.loading = false;
+      console.log(13);
     });
     try {
     } catch (error) {

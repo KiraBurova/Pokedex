@@ -52,6 +52,7 @@ const PokemonsList = observer(() => {
           visible={visible}
           selectedPokemon={selectedPokemon}
           pokemonAbilities={pokemonAbilities}
+          loading={loading}
         />
       </Spin>
     </div>
